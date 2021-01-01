@@ -18,6 +18,7 @@ router.post('/', async (req, res, next) => {
       msg: 'Please pass username and password.',
     });
   }
+
   if (req.query.action === 'register') {
     const goodPwd = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
     if (!req.body.password.match(goodPwd)) {
@@ -29,7 +30,7 @@ router.post('/', async (req, res, next) => {
       await User.create(req.body).catch(next);
       res.status(201).json({
         code: 201,
-        msg: 'Successful created new user.',
+        msg: 'Successfully created new user.',
       });
     }
   } else {

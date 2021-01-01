@@ -2,11 +2,13 @@ import chai from "chai";
 import request from "supertest";
 const mongoose = require("mongoose");
 import User from "../../../../api/users/userModel";
+import api from "../../../../index";
 
 const expect = chai.expect;
 
 let db;
-let api;
+//let api;
+let token;
 
 const users = [
   {
@@ -20,12 +22,23 @@ const users = [
 ];
 
 describe("Users endpoint", () => {
-  before(() => {
+  before((done) => {
     mongoose.connect(process.env.mongoDB, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     db = mongoose.connection;
+    request(api)
+      .post("/api/users")
+      .send({
+        "username": "user1",
+        "password": "test1"
+      })
+      .end((err, res) => {
+        token = res.body.token;
+        console.log(token)
+        done();
+      });
   });
 
   after(async () => {
@@ -37,7 +50,7 @@ describe("Users endpoint", () => {
   });
   beforeEach(async () => {
     try {
-      api = require("../../../../index");
+      //api = require("../../../../index");
       await User.deleteMany({});
       await User.collection.insertMany(users);
     } catch (err) {
@@ -68,13 +81,13 @@ describe("Users endpoint", () => {
   describe("POST / ", () => {
     it("should return a 200 status and the confirmation message", () => {
       return request(api)
-        .post("/api/users")
+        .post("/api/users?action=register")
         .send({
           username: "user3",
           password: "test3",
         })
-        .expect(200)
-        .expect({ success: true, token: "FakeTokenForNow" });
+        .expect(201)
+        .expect({ code: 201, msg: 'Successfully created new user.' });
     });
     after(() => {
       return request(api)
