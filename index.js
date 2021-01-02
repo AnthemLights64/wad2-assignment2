@@ -10,7 +10,6 @@ import bodyParser from 'body-parser';
 import usersRouter from './api/users';
 import loglevel from 'loglevel';
 
-
 dotenv.config();
 
 if (process.env.SEED_DB) {
@@ -26,6 +25,10 @@ const errHandler = (err, req, res, next) => {
   }
   res.status(500).send(`Hey!! You caught the error 👍👍, ${err.stack} `);
 };
+
+const YAML = require('yamljs');
+var swaggerui=require('swagger-ui-express');
+const swaggerDocument = YAML.load('./swagger.yaml');
 
 const app = express();
 
@@ -48,6 +51,8 @@ app.use('/api/genres', genresRouter);
 //Users router
 app.use('/api/users', usersRouter);
 app.use(errHandler);
+
+app.use('/api-docs', swaggerui.serve, swaggerui.setup(swaggerDocument));
 
 let server = app.listen(port, () => {
   loglevel.info(`Server running at ${port}`);
