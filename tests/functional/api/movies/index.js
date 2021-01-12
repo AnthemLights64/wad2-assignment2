@@ -26,8 +26,9 @@ describe("Movies endpoint", function (){
       done();
     },5000);
   });
-  before((done) => {
-    request(api)
+  beforeEach((done) => {
+    try {
+      request(api)
       .post("/api/users")
       .send({
         "username": "user1",
@@ -35,9 +36,11 @@ describe("Movies endpoint", function (){
       })
       .end((err, res) => {
         token = res.body.token;
-        console.log(token)
         done();
       });
+    } catch (err) {
+      loglevel.error(`failed to Load user Data: ${err}`);
+    }   
   });
 
   afterEach(() => {

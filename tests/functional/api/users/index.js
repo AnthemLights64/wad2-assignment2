@@ -22,30 +22,19 @@ const users = [
 ];
 
 describe("Users endpoint", () => {
-  before((done) => {
+  before(() => {
     mongoose.connect(process.env.mongoDB, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     db = mongoose.connection;
-    request(api)
-      .post("/api/users")
-      .send({
-        "username": "user1",
-        "password": "test1"
-      })
-      .end((err, res) => {
-        token = res.body.token;
-        console.log(token)
-        done();
-      });
   });
 
   after(async () => {
     try {
       await db.dropDatabase();
     } catch (error) {
-      console.log(error);
+      loglevel.error(error);
     }
   });
   beforeEach(async () => {
@@ -54,7 +43,7 @@ describe("Users endpoint", () => {
       await User.deleteMany({});
       await User.collection.insertMany(users);
     } catch (err) {
-      console.error(`failed to Load user Data: ${err}`);
+      loglevel.error(`failed to Load user Data: ${err}`);
     }
   });
   afterEach(() => {
