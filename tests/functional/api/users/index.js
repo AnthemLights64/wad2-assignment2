@@ -8,7 +8,6 @@ const expect = chai.expect;
 
 let db;
 //let api;
-let token;
 
 const users = [
   {

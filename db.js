@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+mongoose.set('useFindAndModify', false)
 
 dotenv.config();
 
