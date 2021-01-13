@@ -20,7 +20,7 @@ stages:
   - install
   - build
   - test
-  - deploy
+  - staging
   - production
 
 # Jobs:
@@ -47,7 +47,7 @@ deploy_staging:
   only:
     - develop
     - master
-  stage: deploy
+  stage: staging
 
   before_script:
     - apt-get update -qy
