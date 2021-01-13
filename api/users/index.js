@@ -56,14 +56,17 @@ router.post('/', async (req, res, next) => {
 });
 
 // Update a user
-router.put('/:id',  (req, res, next) => {
-    if (req.body._id) delete req.body._id;
-     User.updateOne({
-      _id: req.params.id,
-    }, req.body, {
-      upsert: false,
-    })
-    .then(user => res.json(200, user)).catch(next);
+router.put('/:userName', async (req, res, next) => {
+  const key = req.params.userName;
+  const user = await User.findByUserName(key);
+  if (!user) return res.status(401).json({ code: 401, msg: 'Invaild username.' });
+  User.updateOne({
+    _id: user._id,
+  }, req.body, {
+    upsert: false,
+  })
+  .then(res.status(200).json({ code: 200, msg: 'The user is successfully updated.' }))
+  .catch(next);
 });
 
 //Add a favourite. With Error Handling. Can't add duplicates.
@@ -72,6 +75,7 @@ router.post('/:userName/favourites', async (req, res, next) => {
     const newFavourite = req.body.id;
     const userName = req.params.userName;
     const movie = await movieModel.findByMovieDBId(newFavourite);
+    if (!movie) return res.status(401).json({ code: 401, msg: 'Invaild movie id.' });
     const user = await User.findByUserName(userName);
     if (user.favourites.indexOf(movie._id) === -1) {
       await user.favourites.push(movie._id);
