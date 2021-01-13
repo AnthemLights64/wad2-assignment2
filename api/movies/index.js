@@ -49,7 +49,7 @@ router.put('/:id', async (req, res, next) => {
   if (movieModel.findByMovieDBId(key)) {
     !updateMovie.id ? updateMovie.id = key : updateMovie;
     if (req.body._id) delete req.body._id;
-    await movieModel.findOneAndUpdate({_id: updateMovie._id}, updateMovie).catch(next);
+    await movieModel.updateOne({id: key}, updateMovie).catch(next);
     res.status(200).json(updateMovie);
   } else {
     res.status(404).send({

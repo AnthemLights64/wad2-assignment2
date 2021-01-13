@@ -35,7 +35,7 @@ Build_api:
   before_script:
      - npm run clean
   script:
-    - npm run compile:all
+    - npm run build
 
 test_api:
   stage: test
