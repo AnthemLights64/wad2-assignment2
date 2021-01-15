@@ -8,15 +8,18 @@ router.get('/', (req, res, next) => {
   movieModel.find().then(movies => res.status(200).send(movies)).catch(next);
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
+  if ( isNaN(req.params.id) ) return res.status(404).json({
+    code: 404,
+    msg: "The id should be a number."
+  });
   const id = parseInt(req.params.id);
-  if (movieModel.findByMovieDBId(id)) {
-    movieModel.findByMovieDBId(id)
-      .then(movie => res.status(200).send(movie))
-      .catch((error) => next(error));
-  } else {
-    res.status(404).catch((error) => next(error));
-  }
+  const movie = await movieModel.findByMovieDBId(id);
+  if ( !movie ) return res.status(404).json({
+    code: 404,
+    msg: "The movie could not be found."
+  });
+  res.status(200).json(movie).catch((error) => next(error));
 });
 
 router.get('/:id/reviews', (req, res, next) => {
@@ -36,37 +39,47 @@ router.post('/', async (req, res, next) => {
     res.status(201).send(newMovie);
   } else {
     res.status(405).send({
-      message: "Invalid Movie Data",
-      status: 405
+      status: 405,
+      message: "Please include a title."
     });
   }
 });
 
 // Update a movie
 router.put('/:id', async (req, res, next) => {
+  if ( isNaN(req.params.id) ) return res.status(404).json({
+    status: 404,
+    msg: "The id is invalid."
+  });
   const key = parseInt(req.params.id);
   const updateMovie = req.body;
-  if (movieModel.findByMovieDBId(key)) {
-    !updateMovie.id ? updateMovie.id = key : updateMovie;
-    if (req.body._id) delete req.body._id;
-    await movieModel.updateOne({id: key}, updateMovie).catch(next);
-    res.status(200).json(updateMovie);
-  } else {
+  const movie = await movieModel.findByMovieDBId(key);
+  if (!movie) {
     res.status(404).send({
       message: 'Unable to find Movie',
       status: 404
     });
+  } else {
+    !updateMovie.id ? updateMovie.id = key : updateMovie;
+    if (req.body._id) delete req.body._id;
+    await movieModel.updateOne({id: key}, updateMovie).catch(next);
+    res.status(200).json(updateMovie);
   }
 });
 
 // Delete a moive
 router.delete('/:id', async (req, res) => {
+  if ( isNaN(req.params.id) ) return res.status(404).json({
+    status: 404,
+    msg: "The id is invalid."
+  });
   const key = parseInt(req.params.id);
-  if (movieModel.findByMovieDBId(key)) {
+  const movie = await movieModel.findByMovieDBId(key);
+  if (!movie) {
+    res.status(404).send({message: `Unable to find movie with id: ${key}.`, status: 404});
+  } else {
     await movieModel.deleteOne({"id":key});
     res.status(200).send({message: `Deleted movie id: ${key}.`,status: 200});
-  } else {
-    res.status(404).send({message: `Unable to find movie with id: ${key}.`, status: 404});
   }
 });
 

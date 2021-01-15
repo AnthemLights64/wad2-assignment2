@@ -2,13 +2,13 @@ import chai from "chai";
 import request from "supertest";
 const mongoose = require("mongoose");
 import User from "../../../../api/users/userModel";
-import api from "../../../../index";
+//import api from "../../../../index";
 import loglevel from 'loglevel';
 
 const expect = chai.expect;
 
 let db;
-//let api;
+let api;
 
 const users = [
   {
@@ -44,7 +44,7 @@ describe("Users endpoint", () => {
   });
   beforeEach(async () => {
     try {
-      //api = require("../../../../index");
+      api = require("../../../../index");
       await User.deleteMany({});
       await User.collection.insertMany(users);
     } catch (err) {
