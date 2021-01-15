@@ -48,7 +48,7 @@ describe("Users endpoint", () => {
       await User.deleteMany({});
       await User.collection.insertMany(users);
     } catch (err) {
-      loglevel.error(`failed to Load user Data: ${err}`);
+      loglevel.info(`failed to Load user Data: ${err}`);
     }
   });
   afterEach(() => {
