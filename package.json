@@ -21,7 +21,7 @@
     "compile:all": "npm-run-all compile:models compile:seed compile:app compile:db compile:copy compile:authenticate compile:tmdb-api",
     "postinstall": "rimraf ./build && npm run compile:all",
     "start": "nodemon --exec babel-node index.js",
-    "test": "cross-env NODE_ENV=test mocha "
+    "test": "cross-env NODE_ENV=test mocha --timeout 10000"
   },
   "author": "Wenlong Lu",
   "license": "ISC",
