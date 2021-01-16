@@ -4,8 +4,6 @@ Name: Wenlong Lu
 
 ## Target Web API.
 
-...... Document the Web API that is the target for this assignment's CI/CD pipeline. Include the API's endpoints and any other features relevant to the creation of a suitable pipeline, e.g.
-
 + Get /api/users - returns an array of user objects.
 + Post /api/users/ - register a user account or authenticate a user.
 + Put /api/users/:userName - update a specific user.
@@ -31,8 +29,6 @@ Name: Wenlong Lu
 
 ## Error/Exception Testing.
 
-.... From the list of endpoints above, specify those that have error/exceptional test cases in your test code, the relevant test file and the nature of the test case(s), e.g.
-
 + Post /api/users - test when password has only number, password has only characters, the length of password is less than 5, nothing is inputed. See tests/functional/api/users/index.js 
 + Put /api/users/:userName - test when username does not exist. See tests/functional/api/users/index.js 
 + Post /api/users/userName/favourites - test when movie is already in favourites, input id is invalid. See tests/functional/api/users/index.js 
@@ -48,8 +44,6 @@ Name: Wenlong Lu
 
 ## Continuous Delivery/Deployment.
 
-..... Specify the URLs for the staging and production deployments of your web API, e.g.
-
 + https://movies-api20091572.herokuapp.com/ - Staging deployment
 + https://movies-api-production20091572.herokuapp.com/ - Production
 
@@ -63,11 +57,6 @@ Name: Wenlong Lu
 
 ![][productionapp]
 
-[If an alternative platform to Heroku was used then show the relevant page from that platform's UI.]
-
-## Feature Flags (If relevant)
-
-... Specify the feature(s) in your web API that is/are controlled by a feature flag(s). Mention the source code files that contain the Optimizerly code that implement the flags. Show screenshots (with appropriate captions) from your Optimizely account that prove you successfully configured the flags.
 
 
 [stagingapp]: ./img/stagingapp.png
