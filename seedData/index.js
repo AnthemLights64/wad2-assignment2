@@ -28,7 +28,7 @@ export async function loadUsers() {
     await users.forEach(user => userModel.create(user));
     loglevel.info(`${users.length} users were successfully stored.`);
   } catch (err) {
-    loglevel.error(`failed to Load user Data: ${err}`);
+    loglevel.info(`failed to Load user Data: ${err}`);
   }
 }
 
@@ -41,7 +41,7 @@ export async function loadMovies() {
     await movieModel.collection.insertMany(movies);
     loglevel.info(`${movies.length} Movies were successfully stored.`);
   } catch (err) {
-    loglevel.error(`failed to Load movie Data: ${err}`);
+    loglevel.info(`failed to Load movie Data: ${err}`);
   }
 }
 
@@ -54,7 +54,7 @@ export async function loadUpcomings() {
     await upcomingModel.collection.insertMany(upcomings);
     loglevel.info(`${upcomings.length} Upcoming movies were successfully stored.`);
   } catch (err) {
-    loglevel.error(`failed to Load upcoming movie Data: ${err}`);
+    loglevel.info(`failed to Load upcoming movie Data: ${err}`);
   }
 }
 
@@ -67,7 +67,7 @@ export async function loadActors() {
       loglevel.info(`${res.length} actors were successfully stored.`);
     })
   } catch (err) {
-    loglevel.error(`failed to Load actor Data: ${err}`);
+    loglevel.info(`failed to Load actor Data: ${err}`);
   }
 }
 
@@ -80,6 +80,6 @@ export async function loadTopRated() {
       loglevel.info(`${res.length} top rated movies were successfully stored.`);
     })
   } catch (err) {
-    loglevel.error(`failed to Load top rated movies Data: ${err}`);
+    loglevel.info(`failed to Load top rated movies Data: ${err}`);
   }
 }
