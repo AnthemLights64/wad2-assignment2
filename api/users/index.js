@@ -80,7 +80,7 @@ router.post('/:userName/favourites', async (req, res, next) => {
     if (user.favourites.indexOf(movie._id) === -1) {
       await user.favourites.push(movie._id);
     } else {
-      res.status(201).json({
+      return res.status(401).json({
         msg: "This movie is already in favourites.",
         user
       });
@@ -105,7 +105,64 @@ router.delete('/:userName/favourites/:id', async (req, res) => {
   if (!user) return res.status(404).json({ code: 404, msg: 'User cannot be found.' });
   if (isNaN(req.params.id)) return res.status(404).json({ code: 404, msg: 'Invaild movie id.' });
   const id = parseInt(req.params.id);
-  await user.removeFromFavourites(id);
+  const movie = await movieModel.findByMovieDBId(id);
+  if (user.favourites.indexOf(movie.id) !== -1) {
+    await user.removeFromFavourites(id);
+  } else {
+    return res.status(404).json({
+      msg: "This movie is not in favourites.",
+      user
+    });
+  }
+  await user.save(); 
+  res.status(200).send({ code: 200, msg: "Successfully deleted."});
+});
+
+// Add to watchlist
+router.post('/:userName/watchlist', async (req, res, next) => {
+  try{
+    const newWatchlist = req.body.id;
+    const userName = req.params.userName;
+    const movie = await movieModel.findByMovieDBId(newWatchlist);
+    if (!movie) return res.status(401).json({ code: 401, msg: 'Invaild movie id.' });
+    const user = await User.findByUserName(userName);
+    if (user.watchlist.indexOf(movie._id) === -1) {
+      await user.watchlist.push(movie._id);
+    } else {
+      return res.status(401).json({
+        msg: "This movie is already in watchlist.",
+        user
+      });
+    }
+    await user.save(); 
+    res.status(201).json(user); 
+  } catch(err) {
+    next(err);
+  }
+});
+
+router.get('/:userName/watchlist', (req, res, next) => {
+  const userName = req.params.userName;
+  User.findByUserName(userName).populate('watchlist').then(
+    user => res.status(201).json(user.watchlist)
+  ).catch(next);
+});
+
+router.delete('/:userName/watchlist/:id', async (req, res) => {
+  const userName = req.params.userName;
+  const user = await User.findByUserName(userName);
+  if (!user) return res.status(404).json({ code: 404, msg: 'User cannot be found.' });
+  if (isNaN(req.params.id)) return res.status(404).json({ code: 404, msg: 'Invaild movie id.' });
+  const id = parseInt(req.params.id);
+  const movie = await movieModel.findByMovieDBId(id);
+  if (user.watchlist.indexOf(movie.id) !== -1) {
+    await user.removeFromWatchlist(id);
+  } else {
+    return res.status(201).json({
+      msg: "This movie is not in watchlist.",
+      user
+    });
+  }
   await user.save(); 
   res.status(200).send({ code: 200, msg: "Successfully deleted."});
 });
