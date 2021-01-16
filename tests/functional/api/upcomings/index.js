@@ -1,39 +1,28 @@
 import chai from "chai";
 import request from "supertest";
 import loglevel from 'loglevel';
-import userModel from "../../../../api/users/userModel";
-import {users} from '../../../../seedData/index.js';
-import upcomingModel from "../../../../api/upcomings/upcomingModel";
-import {upcomings} from '../../../../seedData/upcomings.js';
 
 const expect = chai.expect;
 
 let api;
 let token;
 
-const sampleMovie = {
-  id: 675327,
-  title: "Shadow in the Cloud",
+const sampleUpcoming = {
+  id: 675327,
+  title: "Shadow in the Cloud",
 };
+  
 
 describe("Upcomings endpoint", () => {
   describe("Authorized", () => {
-    beforeEach(async () => {
+    beforeEach((done) => {
       try {
         api = require("../../../../index");
-        await userModel.deleteMany();
-        await userModel.collection.insertMany(users);
       } catch (err) {
-        loglevel.info(`failed to Load user Data: ${err}`);
+        loglevel.error(`failed to Load Data: ${err}`);
       }
-      try {
-        await upcomingModel.deleteMany();
-        await upcomingModel.collection.insertMany(upcomings);
-        loglevel.info(`${upcomings.length} upcoming movies were successfully stored.`);
-      } catch (err) {
-        loglevel.info(`failed to Load movie Data: ${err}`);
-      }
-      return request(api)
+      setTimeout(() => {
+        request(api)
           .post("/api/users")
           .send({
             username: "user1",
@@ -42,15 +31,21 @@ describe("Upcomings endpoint", () => {
           .expect(200)
           .then((res) => {
             token = res.body.token;
+            done();
+          }).catch(err => {
+            loglevel.info(err);
+            done()
           });
+      }, 4000)
     });
-    afterEach(() => {
+    afterEach((done) => {
       api.close(); // Release PORT 8080
       delete require.cache[require.resolve("../../../../index")];
+      done();
     });
 
     describe("GET /upcomings ", () => {
-      it("should return 20 upcomings and a status 200", (done) => {
+      it("should return 20 upcoming movies and a status 200", (done) => {
         request(api)
           .get("/api/upcomings")
           .set("Authorization", token)
@@ -66,14 +61,14 @@ describe("Upcomings endpoint", () => {
 
     describe("GET /upcomings/:id", () => {
       describe("when the id is valid", () => {
-        it("should return the matching movie", () => {
+        it("should return the matching upcoming movie", () => {
           return request(api)
-            .get(`/api/upcomings/${sampleMovie.id}`)
+            .get(`/api/upcomings/${sampleUpcoming.id}`)
             .set("Authorization", token)
             .expect("Content-Type", /json/)
             .expect(200)
             .then((res) => {
-              expect(res.body).to.have.property("title", sampleMovie.title);
+              expect(res.body).to.have.property("title");
             });
         });
       });
@@ -89,7 +84,7 @@ describe("Upcomings endpoint", () => {
           });
         });
         describe("the id is a number but can not be found", () => {
-          it("should return a message that the movie cannot be found", () => {
+          it("should return a message that the upcoming movie cannot be found", () => {
             return request(api)
               .get(`/api/upcomings/19990604`)
               .set("Authorization", token)
@@ -115,7 +110,7 @@ describe("Upcomings endpoint", () => {
               .expect(201)
               .then((res) => {
                 expect(res.body).to.have.property("id");
-                expect(res.body).to.have.property("title","TimeFlyer");
+                expect(res.body).to.have.property("title", "TimeFlyer");
               });
           });
         });
@@ -131,8 +126,8 @@ describe("Upcomings endpoint", () => {
               })
               .expect(201)
               .then((res) => {
-                expect(res.body).to.have.property("id",666666);
-                expect(res.body).to.have.property("title","TimeFlyer");
+                expect(res.body).to.have.property("id", 666666);
+                expect(res.body).to.have.property("title", "TimeFlyer");
               });
           });
         });
@@ -149,9 +144,9 @@ describe("Upcomings endpoint", () => {
               })
               .expect(201)
               .then((res) => {
-                expect(res.body).to.have.property("id",7777777);
-                expect(res.body).to.have.property("title","TimeFlyer");
-                expect(res.body).to.have.property("popularity",100);
+                expect(res.body).to.have.property("id", 7777777);
+                expect(res.body).to.have.property("title", "TimeFlyer");
+                expect(res.body).to.have.property("popularity", 100);
               });
           });
         });
@@ -168,9 +163,9 @@ describe("Upcomings endpoint", () => {
                 popularity: 100
               })
               .expect(405)
-              .expect({ 
+              .expect({
                 status: 405,
-                message: "Please include a title." 
+                message: "Please include a title."
               });
           });
         });
@@ -182,9 +177,9 @@ describe("Upcomings endpoint", () => {
               .set("Authorization", token)
               .send({})
               .expect(405)
-              .expect({ 
+              .expect({
                 status: 405,
-                message: "Please include a title." 
+                message: "Please include a title."
               });
           });
         });
@@ -193,90 +188,89 @@ describe("Upcomings endpoint", () => {
 
     describe("PUT /upcomings/:id", () => {
       describe("when the input id is valid", () => {
-          describe("and the id can be found", () => {
-            describe("while the request payload includes title", () => {
-              it("should return the updated info and a status 200", () => {
-                return request(api)
-                  .put(`/api/upcomings/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .send({
-                    title: "Mulan updated"
-                  })
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                  });
-              });
-              after(()=>{
-                return request(api)
-                  .get(`/api/upcomings/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                  });
-              });
-            });
-            describe("while the request payload includes title and more properties", () => {
-              it("should return the updated info and a status 200", () => {
-                return request(api)
-                  .put(`/api/upcomings/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .send({
-                    title: "Mulan updated",
-                    genre_ids: [
-                      28,
-                      14,
-                      878
-                    ],
-                    release_date: "2021-01-01"
-                  })
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                    expect(res.body).to.have.property("genre_ids");
-                    expect(res.body).to.have.property("release_date","2021-01-01");
-                  });
-              });
-              after(()=>{
-                return request(api)
-                  .get(`/api/upcomings/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                    expect(res.body).to.have.property("genre_ids");
-                    expect(res.body).to.have.property("release_date","2021-01-01");
-                  });
-              });
-            });
-          });
-
-          describe("and the id cannot be found", () => {
-            it("should return the message of unable to find movie and a status 404", () => {
+        describe("and the id can be found", () => {
+          describe("while the request payload includes title", () => {
+            it("should return the updated info and a status 200", () => {
               return request(api)
-                .put(`/api/upcomings/123321`)
+                .put(`/api/upcomings/${sampleUpcoming.id}`)
                 .set("Accept", "application/json")
                 .set("Authorization", token)
                 .send({
-                  title: "Updated Title"
+                  title: "Mulan updated"
                 })
                 .expect("Content-Type", /json/)
-                .expect(404)
-                .expect({
-                  message: 'Unable to find Movie',
-                  status: 404
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
+                });
+            });
+            after(() => {
+              return request(api)
+                .get(`/api/upcomings/${sampleUpcoming.id}`)
+                .set("Accept", "application/json")
+                .set("Authorization", token)
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
                 });
             });
           });
+          describe("while the request payload includes title and more properties", () => {
+            it("should return the updated info and a status 200", () => {
+              return request(api)
+                .put(`/api/upcomings/${sampleUpcoming.id}`)
+                .set("Accept", "application/json")
+                .set("Authorization", token)
+                .send({
+                  title: "Mulan updated",
+                  genre_ids: [
+                    28,
+                    14,
+                    878
+                  ],
+                  release_date: "2021-01-01"
+                })
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
+                  expect(res.body).to.have.property("genre_ids");
+                  expect(res.body).to.have.property("release_date", "2021-01-01");
+                });
+            });
+            after(() => {
+              return request(api)
+                .get(`/api/upcomings/${sampleUpcoming.id}`)
+                .set("Accept", "application/json")
+                .set("Authorization", token)
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
+                  expect(res.body).to.have.property("genre_ids");
+                  expect(res.body).to.have.property("release_date", "2021-01-01");
+                });
+            });
+          });
+        });
+        describe("and the id cannot be found", () => {
+          it("should return the message of unable to find movie and a status 404", () => {
+            return request(api)
+              .put(`/api/upcomings/123321`)
+              .set("Accept", "application/json")
+              .set("Authorization", token)
+              .send({
+                title: "Updated Title"
+              })
+              .expect("Content-Type", /json/)
+              .expect(404)
+              .expect({
+                message: 'Unable to find movie',
+                status: 404
+              });
+          });
+        });
       });
       describe("when the input id is invalid", () => {
         it("should return the message of invalid id and a status 200", () => {
@@ -304,18 +298,18 @@ describe("Upcomings endpoint", () => {
         describe("and the id can be found", () => {
           it("should return the success message and a status 200", () => {
             return request(api)
-              .delete(`/api/upcomings/${sampleMovie.id}`)
+              .delete(`/api/upcomings/${sampleUpcoming.id}`)
               .set("Authorization", token)
               .expect("Content-Type", /json/)
               .expect(200)
               .expect({
-                message: `Deleted movie id: ${sampleMovie.id}.`,
+                message: `Deleted movie id: ${sampleUpcoming.id}.`,
                 status: 200
               });
           });
           after(() => {
             return request(api)
-              .get(`/api/upcomings/${sampleMovie.id}`)
+              .get(`/api/upcomings/${sampleUpcoming.id}`)
               .set("Accept", "application/json")
               .set("Authorization", token)
               .expect(404)
@@ -330,7 +324,7 @@ describe("Upcomings endpoint", () => {
               .expect("Content-Type", /json/)
               .expect(404)
               .expect({
-                message: `Unable to find movie with id: 957369.`, 
+                message: `Unable to find movie with id: 957369.`,
                 status: 404
               });
           });
@@ -354,18 +348,17 @@ describe("Upcomings endpoint", () => {
   });
 
   describe("Unauthorized", () => {
-    beforeEach(async () => {
+    before(() => {
       try {
         api = require("../../../../index");
-        await upcomingModel.deleteMany({});
-        await upcomingModel.collection.insertMany(users);
       } catch (err) {
-        loglevel.info(`failed to Load user Data: ${err}`);
+        loglevel.error(`failed to Load upcoming movies Data: ${err}`);
       }
     });
-    afterEach(() => {
+    after((done) => {
       api.close();
       delete require.cache[require.resolve("../../../../index")];
+      done();
     });
     describe("GET /upcomings", () => {
       it("should a status 401 of unauthorized", () => {
@@ -377,7 +370,7 @@ describe("Upcomings endpoint", () => {
     describe("GET /upcomings/:id", () => {
       it("should a status 401 of unauthorized", () => {
         request(api)
-          .get(`/api/upcomings/${sampleMovie.id}`)
+          .get(`/api/upcomings/${sampleUpcoming.id}`)
           .expect(401);
       });
     });
@@ -395,7 +388,7 @@ describe("Upcomings endpoint", () => {
     describe("PUT /upcomings/:id", () => {
       it("should a status 401 of unauthorized", () => {
         request(api)
-          .put(`/api/upcomings/${sampleMovie.id}`)
+          .put(`/api/upcomings/${sampleUpcoming.id}`)
           .set("Accept", "application/json")
           .send({
             title: "Mulan Updated"
@@ -406,11 +399,11 @@ describe("Upcomings endpoint", () => {
     describe("DELETE /upcomings/:id", () => {
       it("should a status 401 of unauthorized", () => {
         request(api)
-          .delete(`/api/upcomings/${sampleMovie.id}`)
+          .delete(`/api/upcomings/${sampleUpcoming.id}`)
           .expect(401);
       });
     });
   });
-  
+
 
 });

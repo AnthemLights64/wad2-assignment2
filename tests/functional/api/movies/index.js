@@ -1,10 +1,6 @@
 import chai from "chai";
 import request from "supertest";
 import loglevel from 'loglevel';
-import userModel from "../../../../api/users/userModel";
-import {users} from '../../../../seedData/index.js';
-import movieModel from "../../../../api/movies/movieModel";
-import {movies} from '../../../../seedData/movies.js';
 
 const expect = chai.expect;
 
@@ -18,22 +14,14 @@ const sampleMovie = {
 
 describe("Movies endpoint", () => {
   describe("Authorized", () => {
-    beforeEach(async () => {
+    beforeEach((done) => {
       try {
         api = require("../../../../index");
-        await userModel.deleteMany();
-        await userModel.collection.insertMany(users);
       } catch (err) {
-        loglevel.info(`failed to Load user Data: ${err}`);
+        loglevel.error(`failed to Load Data: ${err}`);
       }
-      try {
-        await movieModel.deleteMany();
-        await movieModel.collection.insertMany(movies);
-        loglevel.info(`${movies.length} Movies were successfully stored.`);
-      } catch (err) {
-        loglevel.info(`failed to Load movie Data: ${err}`);
-      }
-      return request(api)
+      setTimeout(() => {
+        request(api)
           .post("/api/users")
           .send({
             username: "user1",
@@ -42,11 +30,17 @@ describe("Movies endpoint", () => {
           .expect(200)
           .then((res) => {
             token = res.body.token;
+            done();
+          }).catch(err => {
+            loglevel.info(err);
+            done()
           });
+      }, 4000)
     });
-    afterEach(() => {
+    afterEach((done) => {
       api.close(); // Release PORT 8080
       delete require.cache[require.resolve("../../../../index")];
+      done();
     });
 
     describe("GET /movies ", () => {
@@ -115,7 +109,7 @@ describe("Movies endpoint", () => {
               .expect(201)
               .then((res) => {
                 expect(res.body).to.have.property("id");
-                expect(res.body).to.have.property("title","TimeFlyer");
+                expect(res.body).to.have.property("title", "TimeFlyer");
               });
           });
         });
@@ -131,8 +125,8 @@ describe("Movies endpoint", () => {
               })
               .expect(201)
               .then((res) => {
-                expect(res.body).to.have.property("id",666666);
-                expect(res.body).to.have.property("title","TimeFlyer");
+                expect(res.body).to.have.property("id", 666666);
+                expect(res.body).to.have.property("title", "TimeFlyer");
               });
           });
         });
@@ -149,9 +143,9 @@ describe("Movies endpoint", () => {
               })
               .expect(201)
               .then((res) => {
-                expect(res.body).to.have.property("id",7777777);
-                expect(res.body).to.have.property("title","TimeFlyer");
-                expect(res.body).to.have.property("popularity",100);
+                expect(res.body).to.have.property("id", 7777777);
+                expect(res.body).to.have.property("title", "TimeFlyer");
+                expect(res.body).to.have.property("popularity", 100);
               });
           });
         });
@@ -168,9 +162,9 @@ describe("Movies endpoint", () => {
                 popularity: 100
               })
               .expect(405)
-              .expect({ 
+              .expect({
                 status: 405,
-                message: "Please include a title." 
+                message: "Please include a title."
               });
           });
         });
@@ -182,9 +176,9 @@ describe("Movies endpoint", () => {
               .set("Authorization", token)
               .send({})
               .expect(405)
-              .expect({ 
+              .expect({
                 status: 405,
-                message: "Please include a title." 
+                message: "Please include a title."
               });
           });
         });
@@ -193,90 +187,90 @@ describe("Movies endpoint", () => {
 
     describe("PUT /movies/:id", () => {
       describe("when the input id is valid", () => {
-          describe("and the id can be found", () => {
-            describe("while the request payload includes title", () => {
-              it("should return the updated info and a status 200", () => {
-                return request(api)
-                  .put(`/api/movies/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .send({
-                    title: "Mulan updated"
-                  })
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                  });
-              });
-              after(()=>{
-                return request(api)
-                  .get(`/api/movies/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                  });
-              });
-            });
-            describe("while the request payload includes title and more properties", () => {
-              it("should return the updated info and a status 200", () => {
-                return request(api)
-                  .put(`/api/movies/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .send({
-                    title: "Mulan updated",
-                    genre_ids: [
-                      28,
-                      14,
-                      878
-                    ],
-                    release_date: "2021-01-01"
-                  })
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                    expect(res.body).to.have.property("genre_ids");
-                    expect(res.body).to.have.property("release_date","2021-01-01");
-                  });
-              });
-              after(()=>{
-                return request(api)
-                  .get(`/api/movies/${sampleMovie.id}`)
-                  .set("Accept", "application/json")
-                  .set("Authorization", token)
-                  .expect("Content-Type", /json/)
-                  .expect(200)
-                  .then((res) => {
-                    expect(res.body).to.have.property("title","Mulan updated");
-                    expect(res.body).to.have.property("genre_ids");
-                    expect(res.body).to.have.property("release_date","2021-01-01");
-                  });
-              });
-            });
-          });
-
-          describe("and the id cannot be found", () => {
-            it("should return the message of unable to find movie and a status 404", () => {
+        describe("and the id can be found", () => {
+          describe("while the request payload includes title", () => {
+            it("should return the updated info and a status 200", () => {
               return request(api)
-                .put(`/api/movies/123321`)
+                .put(`/api/movies/${sampleMovie.id}`)
                 .set("Accept", "application/json")
                 .set("Authorization", token)
                 .send({
-                  title: "Updated Title"
+                  title: "Mulan updated"
                 })
                 .expect("Content-Type", /json/)
-                .expect(404)
-                .expect({
-                  message: 'Unable to find Movie',
-                  status: 404
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
+                });
+            });
+            after(() => {
+              return request(api)
+                .get(`/api/movies/${sampleMovie.id}`)
+                .set("Accept", "application/json")
+                .set("Authorization", token)
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
                 });
             });
           });
+          describe("while the request payload includes title and more properties", () => {
+            it("should return the updated info and a status 200", () => {
+              return request(api)
+                .put(`/api/movies/${sampleMovie.id}`)
+                .set("Accept", "application/json")
+                .set("Authorization", token)
+                .send({
+                  title: "Mulan updated",
+                  genre_ids: [
+                    28,
+                    14,
+                    878
+                  ],
+                  release_date: "2021-01-01"
+                })
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
+                  expect(res.body).to.have.property("genre_ids");
+                  expect(res.body).to.have.property("release_date", "2021-01-01");
+                });
+            });
+            after(() => {
+              return request(api)
+                .get(`/api/movies/${sampleMovie.id}`)
+                .set("Accept", "application/json")
+                .set("Authorization", token)
+                .expect("Content-Type", /json/)
+                .expect(200)
+                .then((res) => {
+                  expect(res.body).to.have.property("title", "Mulan updated");
+                  expect(res.body).to.have.property("genre_ids");
+                  expect(res.body).to.have.property("release_date", "2021-01-01");
+                });
+            });
+          });
+        });
+
+        describe("and the id cannot be found", () => {
+          it("should return the message of unable to find movie and a status 404", () => {
+            return request(api)
+              .put(`/api/movies/123321`)
+              .set("Accept", "application/json")
+              .set("Authorization", token)
+              .send({
+                title: "Updated Title"
+              })
+              .expect("Content-Type", /json/)
+              .expect(404)
+              .expect({
+                message: 'Unable to find Movie',
+                status: 404
+              });
+          });
+        });
       });
       describe("when the input id is invalid", () => {
         it("should return the message of invalid id and a status 200", () => {
@@ -330,7 +324,7 @@ describe("Movies endpoint", () => {
               .expect("Content-Type", /json/)
               .expect(404)
               .expect({
-                message: `Unable to find movie with id: 957369.`, 
+                message: `Unable to find movie with id: 957369.`,
                 status: 404
               });
           });
@@ -354,18 +348,17 @@ describe("Movies endpoint", () => {
   });
 
   describe("Unauthorized", () => {
-    beforeEach(async () => {
+    before(() => {
       try {
         api = require("../../../../index");
-        await movieModel.deleteMany();
-        await movieModel.collection.insertMany(movies);
       } catch (err) {
-        loglevel.info(`failed to Load movie Data: ${err}`);
+        loglevel.error(`failed to Load movie Data: ${err}`);
       }
     });
-    afterEach(() => {
+    after((done) => {
       api.close();
       delete require.cache[require.resolve("../../../../index")];
+      done();
     });
     describe("GET /movies", () => {
       it("should a status 401 of unauthorized", () => {
@@ -411,6 +404,6 @@ describe("Movies endpoint", () => {
       });
     });
   });
-  
+
 
 });

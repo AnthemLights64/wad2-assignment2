@@ -199,7 +199,7 @@ describe("Users endpoint", () => {
     }); 
   });
 
-  describe("PUT / ", () => {
+  describe("PUT /:userName ", () => {
     describe("when the input is valid", () => {
       it("should return a status 200 and the success message", () => {
         return request(api)

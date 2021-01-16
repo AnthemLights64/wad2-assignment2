@@ -55,7 +55,7 @@ router.get('/:id', async (req, res, next) => {
     const movie = await upcomingModel.findByMovieDBId(key);
     if (!movie) {
       res.status(404).send({
-        message: 'Unable to find Movie',
+        message: 'Unable to find movie',
         status: 404
       });
     } else {
