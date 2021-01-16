@@ -10,7 +10,7 @@
     "compile:usermodels": "babel ./api/users --out-dir build/api/users",
     "compile:genremodels": "babel ./api/genres --out-dir build/api/genres",
     "compile:upcomingmodels": "babel ./api/upcomings --out-dir build/api/upcomings",
-    "complie:topRatedmodels": "babel ./api/topRated --out-dir build/api/topRated",
+    "compile:topRatedmodels": "babel ./api/topRated --out-dir build/api/topRated",
     "compile:actormodels": "babel ./api/actors --out-dir build/api/actors",
     "compile:authenticate": "babel ./authenticate --out-dir build/authenticate",
     "compile:tmdb-api": "babel ./api --out-dir build/api",
