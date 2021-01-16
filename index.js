@@ -1,11 +1,12 @@
 import session from 'express-session';
 import passport from './authenticate';
-import {loadUsers, loadMovies, loadUpcomings, loadActors} from './seedData';
+import {loadUsers, loadMovies, loadUpcomings, loadActors, loadTopRated} from './seedData';
 import './db';
 import dotenv from 'dotenv';
 import express from 'express';
 import moviesRouter from './api/movies';
 import upcomingsRouter from './api/upcomings';
+import topRatedRouter from './api/topRated';
 import actorsRouter from './api/actors';
 import genresRouter from './api/genres';
 import bodyParser from 'body-parser';
@@ -19,6 +20,7 @@ if (process.env.SEED_DB) {
   loadMovies();
   loadUpcomings();
   loadActors();
+  loadTopRated();
 }
 
 const errHandler = (err, req, res, next) => {
@@ -52,6 +54,7 @@ app.use(bodyParser.urlencoded());
 app.use(passport.initialize());
 app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
 app.use('/api/upcomings', passport.authenticate('jwt', {session: false}), upcomingsRouter);
+app.use('/api/topRated', topRatedRouter);
 app.use('/api/actors', actorsRouter);
 app.use('/api/genres', genresRouter);
 //Users router

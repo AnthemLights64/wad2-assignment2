@@ -2,9 +2,11 @@ import userModel from '../api/users/userModel';
 import movieModel from '../api/movies/movieModel';
 import upcomingModel from '../api/upcomings/upcomingModel';
 import actorModel from '../api/actors/actorModel';
+import topRatedModel from '../api/topRated/topRatedModel';
 import {movies} from './movies.js';
 import {upcomings} from './upcomings.js';
 import { getActors } from '../api/tmdb-api';
+import { getTopRatedMovies } from '../api/tmdb-api';
 import loglevel from 'loglevel';
 
 const users = [
@@ -65,6 +67,19 @@ export async function loadActors() {
       loglevel.info(`${res.length} actors were successfully stored.`);
     })
   } catch (err) {
-    console.error(`failed to Load actor Data: ${err}`);
+    loglevel.error(`failed to Load actor Data: ${err}`);
+  }
+}
+
+export async function loadTopRated() {
+  loglevel.log('load seed data');
+  try {
+    getTopRatedMovies().then(async res =>{
+      await topRatedModel.deleteMany();
+      await topRatedModel.collection.insertMany(res);
+      loglevel.info(`${res.length} top rated movies were successfully stored.`);
+    })
+  } catch (err) {
+    loglevel.error(`failed to Load top rated movies Data: ${err}`);
   }
 }

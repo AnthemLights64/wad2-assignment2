@@ -357,10 +357,10 @@ describe("Movies endpoint", () => {
     beforeEach(async () => {
       try {
         api = require("../../../../index");
-        await movieModel.deleteMany({});
-        await movieModel.collection.insertMany(users);
+        await movieModel.deleteMany();
+        await movieModel.collection.insertMany(movies);
       } catch (err) {
-        loglevel.info(`failed to Load user Data: ${err}`);
+        loglevel.info(`failed to Load movie Data: ${err}`);
       }
     });
     afterEach(() => {
