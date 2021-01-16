@@ -297,4 +297,83 @@ describe("Users endpoint", () => {
     });
   });
 
+  describe("DELETE /:userName/favourites/:id", () => {
+    describe("when both the username and id are valid", () => {
+      before(()=> {
+        request(api)
+          .post("/api/users/user1/favourites")
+          .send({
+            id: `${sampleMovie.id}`,
+            title: `${sampleMovie.title}`
+          })
+      });
+      it("should return the success message and a status 200", () => {
+        request(api)
+          .delete(`/api/users/user1/favourites/${sampleMovie.id}`)
+          .expect("Content-Type", /json/)
+          .expect(200)
+          .expect({ code: 200, msg: "Successfully deleted." });
+      });
+      after(() =>{
+        request(api)
+        .get("/api/users/user1/favourites")
+        .expect("Content-Type", /json/)
+        .expect(200)
+        .expect({});
+      });
+    });
+    describe("when one of the username and id is invalid or both invalid", () => {
+      describe("the username is valid but id is invalid", () => {
+        before(()=> {
+          request(api)
+            .post("/api/users/user1/favourites")
+            .send({
+              id: `${sampleMovie.id}`,
+              title: `${sampleMovie.title}`
+            })
+        });
+        it("should return the invalid id message and a status 404", () => {
+          request(api)
+            .delete(`/api/users/user1/favourites/xxxx`)
+            .expect("Content-Type", /json/)
+            .expect(404)
+            .expect({ code: 404, msg: "Invaild movie id." });
+        });
+      });
+      describe("the id is valid but username is invalid", () => {
+        before(()=> {
+          request(api)
+            .post("/api/users/user1/favourites")
+            .send({
+              id: `${sampleMovie.id}`,
+              title: `${sampleMovie.title}`
+            })
+        });
+        it("should return the invalid username message and a status 404", () => {
+          request(api)
+            .delete(`/api/users/user1/favourites/xxxx`)
+            .expect("Content-Type", /json/)
+            .expect(404)
+            .expect({ code: 404, msg: "User cannot be found." });
+        });
+      });
+      describe("both the username and id are invalid", () => {
+        before(()=> {
+          request(api)
+            .post("/api/users/user1/favourites")
+            .send({
+              id: `${sampleMovie.id}`,
+              title: `${sampleMovie.title}`
+            })
+        });
+        it("should return a status 404", () => {
+          request(api)
+            .delete(`/api/users/userNobody/favourites/xxxx`)
+            .expect("Content-Type", /json/)
+            .expect(404);
+        });
+      });
+    });
+  })
+
 });
