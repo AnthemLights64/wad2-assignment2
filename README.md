@@ -25,7 +25,11 @@ Name: Wenlong Lu
 + Post /api/upcomings - add a new movie to the upcoming movies database. It will generate a random id if the request payload does not inlude id. The title is required.
 + Put /api/upcomings/:id - update a specific upcoming movie. The request payload includes the some/all of the following movie properties to be updated: title, genre list, release date.
 + Delete /api/upcomings/:id - delete a specific upcoming movie. 
-+ etc.  
+
++ Get /api/upcomings/:id - test when the id is not a number, is a number but cannot be found in database. Test getting a movie without prior authentication. See tests/functional/api/upcomings/index.js 
++ Post /api/upcomings - test when the new movie has no title, invalid release date, empty genre list. Test adding a movie without prior authentication. See tests/functional/api/upcomings/index.js 
++ Put /api/upcomings/:id - test when the id is not a number, is a number but cannot be found in database.  Test updating a movie without prior authentication. See tests/functional/api/upcomings/index.js 
++ Delete /api/upcomings/:id - test when the id is not a number, is a number but cannot be found in database. Test deleting a movie without prior authentication. See tests/functional/api/upcomings/index.js  
 
 ## Error/Exception Testing.
 
