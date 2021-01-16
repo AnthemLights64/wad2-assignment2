@@ -13,6 +13,11 @@ UserSchema.statics.findByUserName = function (username) {
   return this.findOne({ username: username });
 };
 
+UserSchema.methods.removeFromFavourites = function(id) {
+  const index = this.favourites.indexOf(id);
+  this.favourites.splice(index,1);
+};
+
 UserSchema.methods.comparePassword = function(passw, cb) {
   bcrypt.compare(passw, this.password, (err, isMatch) => {
       if (err) {

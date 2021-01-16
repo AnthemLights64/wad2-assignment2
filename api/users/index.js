@@ -99,4 +99,15 @@ router.get('/:userName/favourites', (req, res, next) => {
   ).catch(next);
 });
 
+router.delete('/:userName/favourites/:id', async (req, res) => {
+  const userName = req.params.userName;
+  const user = await User.findByUserName(userName);
+  if (!user) return res.status(404).json({ code: 404, msg: 'User cannot be found' });
+  if (isNaN(req.params.id)) return res.status(404).json({ code: 404, msg: 'Invaild movie id.' });
+  const id = parseInt(req.params.id);
+  await user.removeFromFavourites(id);
+  await user.save(); 
+  res.status(200).send({ code: 200, msg: `The user: ${userName} is successfully deleted`});
+});
+
 export default router;
