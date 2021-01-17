@@ -1,66 +1,85 @@
-# Assignment 2 - Agile Software Practice.
+# Assignment 2 - Web API.
 
 Name: Wenlong Lu
 
-## Target Web API.
+## Features.
 
-+ Get /api/users - returns an array of user objects.
-+ Post /api/users/ - register a user account or authenticate a user.
-+ Put /api/users/:userName - update a specific user.
-+ Post /api/users/:userName/favourites - add a movie to favourites of a specific user.
-+ Get /api/users/:userName/favourites - get a list of favourites of a specific user.
-+ Delete /api/users/:userName/favourites/:id - delete a movie from the favourites list of a specific user
-+ Post /api/users/:userName/watchlist - add a movie to watchlist of a specific user.
-+ Get /api/users/:userName/watchlist - get a list of watchlist of a specific user.
-+ Delete /api/users/:userName/watchlist/:id - delete a movie from the watchlist list of a specific user
+...... A bullet-point list of the ADDITIONAL features you have implemented in the API **THAT WERE NOT IN THE LABS** ......,
+ 
+ + Feature 1 - .... a statement of its purpose/objective ..... 
+ + Feature 2 - .......
+ + Feature 3 = ......
+ + etc
+ + etc
 
-+ Get /api/movies - returns an array of movie objects.
-+ Get /api/movies/:id - returns detailed information on a specific movie.
-+ Post /api/movies - add a new movie to the database. It will generate a random id if the request payload does not inlude id. The title is required.
-+ Put /api/movies/:id - update a specific movie. The request payload includes the some/all of the following movie properties to be updated: title, genre list, release date.
-+ Delete /api/movies/:id - delete a specific movie. 
+## Installation Requirements
 
-+ Get /api/upcomings - returns an array of upcoming movie objects.
-+ Get /api/upcomings/:id - returns detailed information on a specific movie.
-+ Post /api/upcomings - add a new movie to the upcoming movies database. It will generate a random id if the request payload does not inlude id. The title is required.
-+ Put /api/upcomings/:id - update a specific upcoming movie. The request payload includes the some/all of the following movie properties to be updated: title, genre list, release date.
-+ Delete /api/upcomings/:id - delete a specific upcoming movie. 
+Describe what needs to be on the machine to run the API (Node v?, NPM, MongoDB instance, any other 3rd party software not in the package.json). 
 
-## Error/Exception Testing.
+Describe getting/installing the software, perhaps:
 
-+ Post /api/users - test when password has only number, password has only characters, the length of password is less than 5, nothing is inputed. See tests/functional/api/users/index.js 
-+ Put /api/users/:userName - test when username does not exist. See tests/functional/api/users/index.js 
-+ Post /api/users/userName/favourites - test when movie is already in favourites, input id is invalid. See tests/functional/api/users/index.js 
-+ Delete /api/users/:userName/favourites/:id - test when the movie is not in favourtes,  valid username but invalid movie id, valid movie id but invalid username, invalid username and id. See tests/functional/api/users/index.js 
-+ Post /api/users/userName/watchlist - test when movie is already in watchlist, input id is invalid. See tests/functional/api/users/index.js 
-+ Delete /api/users/:userName/watchlist/:id - test when the movie is not in watchlist,  valid username but invalid movie id, valid movie id but invalid username, invalid username and id. See tests/functional/api/users/index.js 
+```bat
+git clone http:\myrepo.git
+```
 
-+ Get /api/movies/:id - test when the id is not a number, is a number but cannot be found in database. Test getting a movie without prior authentication. See tests/functional/api/movies/index.js 
-+ Post /api/movies - test when the new movie has no title, invalid release date, empty genre list. Test adding a movie without prior authentication. See tests/functional/api/movies/index.js 
-+ Put /api/movies/:id - test when the id is not a number, is a number but cannot be found in database.  Test updating a movie without prior authentication. See tests/functional/api/movies/index.js 
-+ Delete /api/movies/:id - test when the id is not a number, is a number but cannot be found in database. Test deleting a movie without prior authentication. See tests/functional/api/movies/index.js 
+followed by installation
 
-+ Get /api/upcomings/:id - test when the id is not a number, is a number but cannot be found in database. Test getting a movie without prior authentication. See tests/functional/api/upcomings/index.js 
-+ Post /api/upcomings - test when the new movie has no title, invalid release date, empty genre list. Test adding a movie without prior authentication. See tests/functional/api/upcomings/index.js 
-+ Put /api/upcomings/:id - test when the id is not a number, is a number but cannot be found in database.  Test updating a movie without prior authentication. See tests/functional/api/upcomings/index.js 
-+ Delete /api/upcomings/:id - test when the id is not a number, is a number but cannot be found in database. Test deleting a movie without prior authentication. See tests/functional/api/upcomings/index.js 
+```bat
+git install
+```
 
-## Continuous Delivery/Deployment.
+## API Configuration
+Describe any configuration that needs to take place before running the API. For example, creating an ``.env`` and what variables to put in it. Give an example of how this might be structured/done.
+REMEMBER: DON'T PUT YOUR OWN USERNAMES/PASSWORDS/AUTH KEYS IN THE README OR ON GITHUB, just placeholders as indicated below:
 
-..... Specify the URLs for the staging and production deployments of your web API, e.g.
+```bat
+NODE_ENV=development
+PORT=8080
+HOST=
+mongoDB=YourMongoURL
+seedDb=true
+secret=
+```
 
-+ https://movies-api20091572.herokuapp.com/ - Staging deployment
-+ https://movies-api-production20091572.herokuapp.com/ - Production
 
-.... Show a screenshots from the overview page for the two Heroku apps e,g,
+## API Design
+Give an overview of your web API design, perhaps similar to the following: 
 
-+ Staging app overview 
+|  |  GET | POST | PUT | DELETE
+| -- | -- | -- | -- | -- 
+| /api/movies |Gets a list of movies | N/A | N/A |
+| /api/movies/{movieid} | Get a Movie | N/A | N/A | N/A
+| /api/movies/{movieid}/reviews | Get all reviews for movie | Create a new review for Movie | N/A | N/A  
+| ... | ... | ... | ... | ...
 
-![][stagingapp]
+If you have your API design on an online platform or graphic, please link to it (e.g. [Swaggerhub](https://app.swaggerhub.com/)).
 
-+ Production app overview 
 
-![][productionapp]
+## Security and Authentication
+Give details of authentication/ security implemented on the API(e.g. passport/sessions). Indicate which routes are protected.
 
-[stagingapp]: ./img/stagingapp.png
-[productionapp]: ./img/productionapp.png
+## Integrating with React App
+
+Describe how you integrated your React app with the API. Perhaps link to the React App repo and give an example of an API call from React App. For example: 
+
+~~~Javascript
+export const getMovies = () => {
+  return fetch(
+     '/api/movies',{headers: {
+       'Authorization': window.localStorage.getItem('token')
+    }
+  }
+  )
+    .then(res => res.json())
+    .then(json => {return json.results;});
+};
+
+~~~
+
+## Extra features
+
+. . Briefly explain any non-standard features, functional or non-functional, developed for the app.  
+
+## Independent learning.
+
+. . State the non-standard aspects of React/Express/Node (or other related technologies) that you researched and applied in this assignment . .  

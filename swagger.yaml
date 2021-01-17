@@ -10,4 +10,1163 @@ info:
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
+servers:
+  - url: 'http://localhost:8080'
 
+tags:
+  - name: Movies
+  - name: Upcomings
+  - name: TopRated
+  - name: Users
+  - name: Genres
+  - name: Actors
+
+paths:
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Get a list of users
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        "200":
+          description: Successfully got a list of users
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Movie'
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "201":
+          description: Successfully registered
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 201,
+                  msg: 'Successfully created new user.',
+                }
+        "401":
+          description: Bad password.
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 401,
+                  msg: 'Register failed for bad password.',
+                }
+        "402":
+          description: No username or password
+          content:
+            application/json:
+              schema:
+                example: {
+                  success: false,
+                  msg: 'Please pass username and password.',
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                username: user1,
+                passsword: test1,
+              }
+        description: Login with existed account
+        required: true
+
+  /api/users/login:
+    post:
+      tags:
+        - Users
+      summary: Login
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Successfully Loged in.
+          content:
+            application/json:
+              schema:
+                example: {
+                  "success": true, 
+                  "token": "BEARER eyJhbGciOiJIUzI1NiJ9",
+                }
+        "401":
+          description: Wrong password
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 401,
+                  msg: 'Authentication failed. Wrong password.',
+                }
+        "402":
+          description: No username or password
+          content:
+            application/json:
+              schema:
+                example: {
+                  success: false,
+                  msg: 'Please pass username and password.',
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                username: user1,
+                passsword: test1,
+              }
+        description: Login with existed account
+        required: true
+
+  /api/users/{userName}:
+    put:
+      tags:
+        - Users
+      summary: Update a user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 200,
+                  msg: 'The user is successfully updated.',
+                }
+        "404":
+          description: Invalid username
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 404,
+                  msg: 'Unable to find user.',
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                username: updatedUsername,
+                passsword: updatedPassword1,
+              }
+        description: Information to be updated
+        required: true
+
+  /api/users/{userName}/favourites:
+    get:
+      tags:
+        - Users
+      summary: Get favourite movies of a specific user
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Successfully got a list of favourite movies
+        "404":
+          description: Unable to find this user
+    post:
+      tags:
+        - Users
+      summary: Add a movie to the favourites of a specific user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+      responses:
+        "201":
+          description: Successfully added to favourites
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/User'
+        "401":
+          description: The movie is already in favourites
+          content:
+            application/json:
+              schema:
+                example: {
+                  msg: "This movie is already in favourites.",
+                }
+        "404":
+          description: Unable to find this movie
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 404, 
+                  msg: 'Unable to find movie.',
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                id: 666666,
+              }
+        description: Id of the movie which is to add into the favourites
+        required: true
+    
+  /api/users/{userName}/favourites/{id}:
+    delete:
+      tags:
+        - Users
+      summary: Delete a movie from favourites of a specific user
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Successfully deleted
+          content:
+            application/json; charset=utf-8:
+              schema:
+                example: {
+                  code: 200, 
+                  msg: "Successfully deleted.",
+                }      
+        "401":
+          description: The movie is not in favourites
+          content:
+            application/json:
+              schema:
+                example: {
+                  msg: "This movie is not in favourites.",
+                }
+        "403":
+          description: The movie id is invalid
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 403, msg: 'Invaild movie id.',
+                }        
+        "404":
+          description: Unable to find this user
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 404, 
+                  msg: 'User cannot be found.',
+                }        
+    
+  /api/users/{userName}/watchlist:
+    get:
+      tags:
+        - Users
+      summary: Get movies in the watchlist of a specific user
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Successfully got a list of movies in watchlist
+        "404":
+          description: Unable to find this user
+    post:
+      tags:
+        - Users
+      summary: Add a movie to the watchlist of a specific user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+      responses:
+        "201":
+          description: Successfully added to watchlist
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/User'
+        "401":
+          description: The movie is already in watchlist
+          content:
+            application/json:
+              schema:
+                example: {
+                  msg: "This movie is already in watchlist.",
+                }
+        "404":
+          description: Unable to find this movie
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 404, 
+                  msg: 'Unable to find movie.',
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                id: 666666,
+              }
+        description: Id of the movie which is to add into the watchlist
+        required: true
+  
+  /api/users/{userName}/watchlist/{id}:
+    delete:
+      tags:
+        - Users
+      summary: Delete a movie from watchlist of a specific user
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: User's username
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Successfully deleted
+          content:
+            application/json; charset=utf-8:
+              schema:
+                example: {
+                  code: 200, 
+                  msg: "Successfully deleted.",
+                }      
+        "401":
+          description: The movie is not in watchlist
+          content:
+            application/json:
+              schema:
+                example: {
+                  msg: "This movie is not in favourites.",
+                }
+        "403":
+          description: The movie id is invalid
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 403, msg: 'Invaild movie id.',
+                }        
+        "404":
+          description: Unable to find this user
+          content:
+            application/json:
+              schema:
+                example: {
+                  code: 404, 
+                  msg: 'User cannot be found.',
+                }        
+
+  /api/movies:
+    get:
+      tags:
+        - Movies
+      summary: Get movies from database
+      parameters: []
+      security:
+        - bearer: []
+      responses:
+        "200":
+          description: Successfully got movies
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Movie'
+        "401":
+          description: Unauthorized. 
+    post:
+      tags:
+        - Movies
+      summary: Add a new movie to database
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      responses:
+        "201":
+          description: Successfully added
+          schema:
+            $ref: '#/components/schemas/Movie'
+        "401":
+          description: Unauthorized. 
+        "405":
+          description: Title is not included.
+          content:
+            application/json:
+              schema:
+                example: {
+                  status: 405,
+                  message: "Please include a title.",
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: newTitle,
+              }
+        description: Information of the movie to add into database
+        required: true
+    
+  /api/movies/{id}:
+    get:
+      tags:
+        - Movies
+      summary: Get a movie by id
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got the movie
+          schema:
+            $ref: '#/components/schemas/Movie'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find this movie.
+    put:
+      tags:
+        - Movies
+      summary: Update a movie by id
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully updated a movie
+          schema:
+            $ref: '#/components/schemas/Movie'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: "updated title",
+                popularity: 100.01,
+              }
+        description: Information to update on the movie
+        required: true
+    delete:
+      tags:
+        - Movies
+      summary: Delete a movie by id
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully deleted.
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie.    
+
+  /api/movies/{id}/reviews:
+    get:
+      tags:
+        - Movies
+      summary: Get reviews of a specific movie
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got the reviews of this movie.
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie, or unable to find reviews on this movie.
+
+  /api/upcomings:
+    get:
+      tags:
+        - Upcomings
+      summary: Get upcoming movies from database
+      parameters: []
+      security:
+        - bearer: []
+      responses:
+        "200":
+          description: Successfully got upcoming movies
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Upcoming'
+        "401":
+          description: Unauthorized. 
+    post:
+      tags:
+        - Upcomings
+      summary: Add a new upcoming movie to database
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      responses:
+        "201":
+          description: Successfully added
+          schema:
+            $ref: '#/components/schemas/Upcoming'
+        "401":
+          description: Unauthorized. 
+        "405":
+          description: Title is not included.
+          content:
+            application/json:
+              schema:
+                example: {
+                  status: 405,
+                  message: "Please include a title.",
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: newTitle,
+              }
+        description: Information of the upcoming movie to add into database
+        required: true
+
+  /api/upcomings/{id}:
+    get:
+      tags:
+        - Upcomings
+      summary: Get a upcoming movie by id
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got the upcoming movie
+          schema:
+            $ref: '#/components/schemas/Movie'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find this movie.
+    put:
+      tags:
+        - Upcomings
+      summary: Update a upcoming movie by id
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully updated a upcoming movie
+          schema:
+            $ref: '#/components/schemas/Movie'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: "updated title",
+                popularity: 100.01,
+              }
+        description: Information to update on the upcoming movie
+        required: true
+    delete:
+      tags:
+        - Upcomings
+      summary: Delete a upcoming movie by id
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully deleted.
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie.    
+  
+  /api/topRated:
+    get:
+      tags:
+        - TopRated
+      summary: Get top rated movies from database
+      parameters: []
+      responses:
+        "200":
+          description: Successfully got top rated movies
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TopRated'
+        "401":
+          description: Unauthorized. 
+    post:
+      tags:
+        - TopRated
+      summary: Add a new top rated movie to database
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "201":
+          description: Successfully added
+          schema:
+            $ref: '#/components/schemas/TopRated'
+        "401":
+          description: Unauthorized. 
+        "405":
+          description: Title is not included.
+          content:
+            application/json:
+              schema:
+                example: {
+                  status: 405,
+                  message: "Please include a title.",
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: newTitle,
+              }
+        description: Information of the top rated movie to add into database
+        required: true
+
+  /api/topRated/{id}:
+    get:
+      tags:
+        - TopRated
+      summary: Get a top rated movie by id
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got the top rated movie
+          schema:
+            $ref: '#/components/schemas/TopRated'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find this movie.
+    put:
+      tags:
+        - TopRated
+      summary: Update a top rated movie by id
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully updated a top rated movie
+          schema:
+            $ref: '#/components/schemas/TopRated'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: "updated title",
+                popularity: 100.01,
+              }
+        description: Information to update on the top rated movie
+        required: true   
+    delete:
+      tags:
+        - TopRated
+      summary: Delete a top rated movie by id
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully deleted.
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find movie.   
+
+  /api/actors:
+    get:
+      tags:
+        - Actors
+      summary: Get actors from database
+      parameters: []
+      responses:
+        "200":
+          description: Successfully got actors
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Actor'
+        "401":
+          description: Unauthorized. 
+    post:
+      tags:
+        - Actors
+      summary: Add a new actor to database
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "201":
+          description: Successfully added
+          schema:
+            $ref: '#/components/schemas/Actor'
+        "401":
+          description: Unauthorized. 
+        "405":
+          description: Name is not included.
+          content:
+            application/json:
+              schema:
+                example: {
+                  status: 405,
+                  message: "Please include a Name.",
+                }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                title: newName,
+              }
+        description: Information of the actor to add into database
+        required: true
+    
+  /api/actors/{id}:
+    get:
+      tags:
+        - Actors
+      summary: Get an actor by id
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Actor's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got the actor
+          schema:
+            $ref: '#/components/schemas/Actor'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find this actor.
+    put:
+      tags:
+        - Actors
+      summary: Update an actor by id
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Actor's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully updated an actor
+          schema:
+            $ref: '#/components/schemas/Actor'
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find actor.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: {
+                name: "updated name",
+                popularity: 100.01,
+              }
+        description: Information to update on the actor
+        required: true
+    delete:
+      tags:
+        - Actors
+      summary: Delete an actor by id
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Actor's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully deleted.
+        "401":
+          description: Unauthorized. 
+        "404":
+          description: Invaild id or unable to find actor.    
+
+  /genres:
+    get:
+      tags:
+        - Genres
+      summary: Get genres
+      produces:
+        - application/json
+      parameters: {}
+      responses:
+        "200":
+          description: Success
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        favourites:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Movie'
+        watchlist:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Upcoming'
+    Movie:
+      type: object
+      required:
+        - id
+      properties:
+        adult:
+          type: boolean
+        id:
+          type: number
+          format: int64
+        poster_path:
+          type: string
+        overview:
+          type: string
+        release_date:
+          type: string
+          format: date
+        original_title:
+          type: string
+        genre_ids:
+          type: array
+          items:
+            type: number
+        original_language:
+          type: string
+        title:
+          type: string
+        backdrop_path:
+          type: string
+        popularity:
+          type: number
+        vote_count:
+          type: number
+        video:
+          type: boolean
+        vote_average:
+          type: number
+        production_countries:
+          $ref: '#/components/schemas/production_countries'
+        runtime:
+          type: number
+        spoken_languages:
+          $ref: '#/components/schemas/spoken_languages'
+        status:
+          type: string
+        tagline:
+          type: string
+    Upcoming:
+      type: object
+      required:
+        - id
+      properties:
+        adult:
+          type: boolean
+        id:
+          type: number
+          format: int64
+        poster_path:
+          type: string
+        overview:
+          type: string
+        release_date:
+          type: string
+          format: date
+        original_title:
+          type: string
+        genre_ids:
+          type: array
+          items:
+            type: number
+        original_language:
+          type: string
+        title:
+          type: string
+        backdrop_path:
+          type: string
+        popularity:
+          type: number
+        vote_count:
+          type: number
+        video:
+          type: boolean
+        vote_average:
+          type: number
+        production_countries:
+          $ref: '#/components/schemas/production_countries'
+        runtime:
+          type: number
+        spoken_languages:
+          $ref: '#/components/schemas/spoken_languages'
+        status:
+          type: string
+        tagline:
+          type: string
+    TopRated:
+      type: object
+      required:
+        - id
+      properties:
+        adult:
+          type: boolean
+        id:
+          type: number
+          format: int64
+        poster_path:
+          type: string
+        overview:
+          type: string
+        release_date:
+          type: string
+          format: date
+        original_title:
+          type: string
+        genre_ids:
+          type: array
+          items:
+            type: number
+        original_language:
+          type: string
+        title:
+          type: string
+        backdrop_path:
+          type: string
+        popularity:
+          type: number
+        vote_count:
+          type: number
+        video:
+          type: boolean
+        vote_average:
+          type: number
+        production_countries:
+          $ref: '#/components/schemas/production_countries'
+        runtime:
+          type: number
+        spoken_languages:
+          $ref: '#/components/schemas/spoken_languages'
+        status:
+          type: string
+        tagline:
+          type: string
+    Actor:
+      type: object
+      required:
+        - id
+      properties:
+        adult:
+          type: boolean
+        id:
+          type: number
+          format: int64
+        profile_path:
+          type: string
+        name:
+          type: string
+        popularity:
+          type: number
+        knwon_for:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+    production_countries:
+      type: object
+      properties:
+        iso_3166_1:
+          type: string
+        name:
+          type: string
+    spoken_languages:
+      type: object
+      properties:
+        iso_639_1:
+          type: string
+        name:
+          type: string
+
+  securitySchemes:
+    bearer:
+      type: http
+      name: jwt
+      scheme: bearer
+      bearerFormat: JWT

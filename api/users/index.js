@@ -10,31 +10,15 @@ router.get('/', (req, res, next) => {
   User.find().then(users =>  res.status(200).json(users)).catch(next);
 });
 
-// Register OR authenticate a user
-router.post('/', async (req, res, next) => {
+//login
+router.post('/login', async (req,res,next) => {
   if (!req.body.username || !req.body.password) {
-    res.status(401).json({
+    res.status(402).json({
       success: false,
       msg: 'Please pass username and password.',
     });
   }
-
-  if (req.query.action === 'register') {
-    const goodPwd = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
-    if (!req.body.password.match(goodPwd)) {
-      res.status(401).json({
-        code: 401,
-        msg: 'Register failed for bad password.'
-      });
-    } else {
-      await User.create(req.body).catch(next);
-      res.status(201).json({
-        code: 201,
-        msg: 'Successfully created new user.',
-      });
-    }
-  } else {
-    const user = await User.findByUserName(req.body.username).catch(next);
+  const user = await User.findByUserName(req.body.username).catch(next);
       if (!user) return res.status(401).json({ code: 401, msg: 'Authentication failed. User not found.' });
       user.comparePassword(req.body.password, (err, isMatch) => {
         if (isMatch && !err) {
@@ -46,20 +30,41 @@ router.post('/', async (req, res, next) => {
             token: 'BEARER ' + token,
           });
         } else {
-          res.status(401).json({
-            code: 401,
-            msg: 'Authentication failed. Wrong password.'
-          });
+            return res.status(401).json({
+              code: 401,
+              msg: 'Authentication failed. Wrong password.'
+            });
         }
       });
-    }
+} );
+//register
+router.post('/', async (req, res, next) => {
+  if (!req.body.username || !req.body.password) {
+    res.status(402).json({
+      success: false,
+      msg: 'Please pass username and password.',
+    });
+  }
+  const goodPwd = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+    if (!req.body.password.match(goodPwd)) {
+      res.status(401).json({
+        code: 401,
+        msg: 'Register failed for bad password.'
+      });
+    } else {
+      await User.create(req.body).catch(next);
+      return res.status(201).json({
+        code: 201,
+        msg: 'Successfully created new user.',
+      });
+    }    
 });
 
 // Update a user
 router.put('/:userName', async (req, res, next) => {
   const key = req.params.userName;
   const user = await User.findByUserName(key);
-  if (!user) return res.status(401).json({ code: 401, msg: 'Invaild username.' });
+  if (!user) return res.status(404).json({ code: 404, msg: 'Unable to find user.' });
   User.updateOne({
     _id: user._id,
   }, req.body, {
@@ -75,7 +80,7 @@ router.post('/:userName/favourites', async (req, res, next) => {
     const newFavourite = req.body.id;
     const userName = req.params.userName;
     const movie = await movieModel.findByMovieDBId(newFavourite);
-    if (!movie) return res.status(401).json({ code: 401, msg: 'Invaild movie id.' });
+    if (!movie) return res.status(404).json({ code: 404, msg: 'Unable to find movie.' });
     const user = await User.findByUserName(userName);
     if (user.favourites.indexOf(movie._id) === -1) {
       await user.favourites.push(movie._id);
@@ -103,13 +108,13 @@ router.delete('/:userName/favourites/:id', async (req, res) => {
   const userName = req.params.userName;
   const user = await User.findByUserName(userName);
   if (!user) return res.status(404).json({ code: 404, msg: 'User cannot be found.' });
-  if (isNaN(req.params.id)) return res.status(404).json({ code: 404, msg: 'Invaild movie id.' });
+  if (isNaN(req.params.id)) return res.status(403).json({ code: 403, msg: 'Invaild movie id.' });
   const id = parseInt(req.params.id);
   const movie = await movieModel.findByMovieDBId(id);
   if (user.favourites.indexOf(movie.id) !== -1) {
     await user.removeFromFavourites(id);
   } else {
-    return res.status(404).json({
+    return res.status(401).json({
       msg: "This movie is not in favourites.",
       user
     });
@@ -124,7 +129,7 @@ router.post('/:userName/watchlist', async (req, res, next) => {
     const newWatchlist = req.body.id;
     const userName = req.params.userName;
     const movie = await movieModel.findByMovieDBId(newWatchlist);
-    if (!movie) return res.status(401).json({ code: 401, msg: 'Invaild movie id.' });
+    if (!movie) return res.status(404).json({ code: 404, msg: 'Unable to find movie.' });
     const user = await User.findByUserName(userName);
     if (user.watchlist.indexOf(movie._id) === -1) {
       await user.watchlist.push(movie._id);
@@ -152,13 +157,13 @@ router.delete('/:userName/watchlist/:id', async (req, res) => {
   const userName = req.params.userName;
   const user = await User.findByUserName(userName);
   if (!user) return res.status(404).json({ code: 404, msg: 'User cannot be found.' });
-  if (isNaN(req.params.id)) return res.status(404).json({ code: 404, msg: 'Invaild movie id.' });
+  if (isNaN(req.params.id)) return res.status(403).json({ code: 403, msg: 'Invaild movie id.' });
   const id = parseInt(req.params.id);
   const movie = await movieModel.findByMovieDBId(id);
   if (user.watchlist.indexOf(movie.id) !== -1) {
     await user.removeFromWatchlist(id);
   } else {
-    return res.status(201).json({
+    return res.status(401).json({
       msg: "This movie is not in watchlist.",
       user
     });

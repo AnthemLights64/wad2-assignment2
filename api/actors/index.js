@@ -24,7 +24,7 @@ router.get('/:id', async (req, res, next) => {
 // Add an actor
 router.post('/', async (req, res, next) => {
   let newactor = req.body;
-  if (newactor && newactor.title) {
+  if (newactor && newactor.name) {
     //Adds a random id if missing. 
     !newactor.id ? newactor.id = Math.round(Math.random() * 10000) : newactor;
     await actorModel.create(newactor).catch(next);
@@ -32,7 +32,7 @@ router.post('/', async (req, res, next) => {
   } else {
     res.status(405).send({
       status: 405,
-      message: "Please include a title."
+      message: "Please include a name."
     });
   }
 });
