@@ -10,44 +10,19 @@ router.get('/', (req, res, next) => {
   User.find().then(users =>  res.status(200).json(users)).catch(next);
 });
 
-//login
-router.post('/login', async (req,res,next) => {
-  if (!req.body.username || !req.body.password) {
-    res.status(402).json({
-      success: false,
-      msg: 'Please pass username and password.',
-    });
-  }
-  const user = await User.findByUserName(req.body.username).catch(next);
-      if (!user) return res.status(401).json({ code: 401, msg: 'Authentication failed. User not found.' });
-      user.comparePassword(req.body.password, (err, isMatch) => {
-        if (isMatch && !err) {
-          // if user is found and password is right create a token
-          const token = jwt.sign(user.username, process.env.SECRET);
-          // return the information including token as JSON
-          res.status(200).json({
-            success: true,
-            token: 'BEARER ' + token,
-          });
-        } else {
-            return res.status(401).json({
-              code: 401,
-              msg: 'Authentication failed. Wrong password.'
-            });
-        }
-      });
-} );
-//register
+// Register OR authenticate a user
 router.post('/', async (req, res, next) => {
   if (!req.body.username || !req.body.password) {
-    res.status(402).json({
+    res.status(403).json({
       success: false,
       msg: 'Please pass username and password.',
     });
   }
-  const goodPwd = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+
+  if (req.query.action === 'register') {
+    const goodPwd = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
     if (!req.body.password.match(goodPwd)) {
-      res.status(401).json({
+      return res.status(401).json({
         code: 401,
         msg: 'Register failed for bad password.'
       });
@@ -57,7 +32,27 @@ router.post('/', async (req, res, next) => {
         code: 201,
         msg: 'Successfully created new user.',
       });
-    }    
+    }
+  } else {
+    const user = await User.findByUserName(req.body.username).catch(next);
+      if (!user) return res.status(404).json({ code: 404, msg: 'Authentication failed. User not found.' });
+      user.comparePassword(req.body.password, (err, isMatch) => {
+        if (isMatch && !err) {
+          // if user is found and password is right create a token
+          const token = jwt.sign(user.username, process.env.SECRET);
+          // return the information including token as JSON
+          return res.status(200).json({
+            success: true,
+            token: 'BEARER ' + token,
+          });
+        } else {
+          return res.status(400).json({
+            code: 400,
+            msg: 'Authentication failed. Wrong password.'
+          });
+        }
+      });
+    }
 });
 
 // Update a user
