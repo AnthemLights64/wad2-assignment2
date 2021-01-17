@@ -27,30 +27,25 @@ paths:
       tags:
         - Users
       summary: Get a list of users
-      produces:
-        - application/json
       parameters: []
       responses:
         "200":
           description: Successfully got a list of users
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
     post:
       tags:
         - Users
       summary: Create a new user or login with an existed account
-      consumes:
-        - application/json
-      produces:
-        - application/json
       parameters:
         - name: action
           in: query
           description: register or authenticate
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: Successfully Loged in.
@@ -117,21 +112,18 @@ paths:
         description: Login with existed account or register a new account
         required: true
 
-  /api/users/{userName}:
+  /api/users/{username}:
     put:
       tags:
         - Users
       summary: Update a user
-      consumes:
-        - application/json
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: Successfully updated
@@ -162,19 +154,18 @@ paths:
         description: Information to be updated
         required: true
 
-  /api/users/{userName}/favourites:
+  /api/users/{username}/favourites:
     get:
       tags:
         - Users
       summary: Get favourite movies of a specific user
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: Successfully got a list of favourite movies
@@ -184,16 +175,13 @@ paths:
       tags:
         - Users
       summary: Add a movie to the favourites of a specific user
-      consumes:
-        - application/json
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "201":
           description: Successfully added to favourites
@@ -228,24 +216,25 @@ paths:
         description: Id of the movie which is to add into the favourites
         required: true
     
-  /api/users/{userName}/favourites/{id}:
+  /api/users/{username}/favourites/{id}:
     delete:
       tags:
         - Users
       summary: Delete a movie from favourites of a specific user
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: string
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully deleted
@@ -282,19 +271,18 @@ paths:
                   msg: 'User cannot be found.',
                 }        
     
-  /api/users/{userName}/watchlist:
+  /api/users/{username}/watchlist:
     get:
       tags:
         - Users
       summary: Get movies in the watchlist of a specific user
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: Successfully got a list of movies in watchlist
@@ -304,16 +292,13 @@ paths:
       tags:
         - Users
       summary: Add a movie to the watchlist of a specific user
-      consumes:
-        - application/json
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "201":
           description: Successfully added to watchlist
@@ -348,24 +333,25 @@ paths:
         description: Id of the movie which is to add into the watchlist
         required: true
   
-  /api/users/{userName}/watchlist/{id}:
+  /api/users/{username}/watchlist/{id}:
     delete:
       tags:
         - Users
       summary: Delete a movie from watchlist of a specific user
-      produces:
-        - application/json
       parameters:
         - name: username
           in: path
           description: User's username
           required: true
-          type: string
+          schema:
+            type: string
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: string
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully deleted
@@ -413,27 +399,25 @@ paths:
       responses:
         "200":
           description: Successfully got movies
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
         "401":
           description: Unauthorized. 
     post:
       tags:
         - Movies
       summary: Add a new movie to database
-      consumes:
-        - application/json
-      produces:
-        - application/json
       security:
         - bearer: []
       responses:
         "201":
           description: Successfully added
-          schema:
-            $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
         "401":
           description: Unauthorized. 
         "405":
@@ -460,8 +444,6 @@ paths:
       tags:
         - Movies
       summary: Get a movie by id
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -469,12 +451,16 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got the movie
-          schema:
-            $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
         "401":
           description: Unauthorized. 
         "404":
@@ -483,10 +469,6 @@ paths:
       tags:
         - Movies
       summary: Update a movie by id
-      consumes:
-        - application/json
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -494,12 +476,16 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully updated a movie
-          schema:
-            $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
         "401":
           description: Unauthorized. 
         "404":
@@ -518,8 +504,6 @@ paths:
       tags:
         - Movies
       summary: Delete a movie by id
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -527,7 +511,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully deleted.
@@ -541,8 +527,6 @@ paths:
       tags:
         - Movies
       summary: Get reviews of a specific movie
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -550,7 +534,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got the reviews of this movie.
@@ -564,8 +550,6 @@ paths:
       tags: 
         - Movies
       summary: Get a list of similar movies of a specific movie
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -573,7 +557,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got similar movies of this movie.
@@ -589,8 +575,6 @@ paths:
       tags: 
         - Movies
       summary: Get a list of credits of a specific movie
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -598,7 +582,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got credits of this movie.
@@ -614,14 +600,14 @@ paths:
       tags:
         - TopRated
       summary: Get reviews of a specific top rated movie
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got the reviews of this movie. 
@@ -639,27 +625,25 @@ paths:
       responses:
         "200":
           description: Successfully got upcoming movies
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Upcoming'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Upcoming'
         "401":
           description: Unauthorized. 
     post:
       tags:
         - Upcomings
       summary: Add a new upcoming movie to database
-      consumes:
-        - application/json
-      produces:
-        - application/json
       security:
         - bearer: []
       responses:
         "201":
           description: Successfully added
-          schema:
-            $ref: '#/components/schemas/Upcoming'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Upcoming'
         "401":
           description: Unauthorized. 
         "405":
@@ -686,8 +670,6 @@ paths:
       tags:
         - Upcomings
       summary: Get a upcoming movie by id
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -695,12 +677,16 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got the upcoming movie
-          schema:
-            $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
         "401":
           description: Unauthorized. 
         "404":
@@ -709,10 +695,6 @@ paths:
       tags:
         - Upcomings
       summary: Update a upcoming movie by id
-      consumes:
-        - application/json
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -720,12 +702,16 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully updated a upcoming movie
-          schema:
-            $ref: '#/components/schemas/Movie'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Movie'
         "401":
           description: Unauthorized. 
         "404":
@@ -744,8 +730,6 @@ paths:
       tags:
         - Upcomings
       summary: Delete a upcoming movie by id
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -753,7 +737,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully deleted.
@@ -767,8 +753,6 @@ paths:
       tags: 
         - Upcomings
       summary: Get a list of similar movies of a specific movie
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -776,7 +760,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got similar movies of this movie.
@@ -792,8 +778,6 @@ paths:
       tags: 
         - Upcomings
       summary: Get a list of credits of a specific movie
-      produces:
-        - application/json
       security:
         - bearer: []
       parameters:
@@ -801,7 +785,9 @@ paths:
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got credits of this movie.
@@ -821,23 +807,21 @@ paths:
       responses:
         "200":
           description: Successfully got top rated movies
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/TopRated'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/TopRated'
     post:
       tags:
         - TopRated
       summary: Add a new top rated movie to database
-      consumes:
-        - application/json
-      produces:
-        - application/json
       responses:
         "201":
           description: Successfully added
-          schema:
-            $ref: '#/components/schemas/TopRated'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/TopRated'
         "405":
           description: Title is not included.
           content:
@@ -862,40 +846,42 @@ paths:
       tags:
         - TopRated
       summary: Get a top rated movie by id
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got the top rated movie
-          schema:
-            $ref: '#/components/schemas/TopRated'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/TopRated'
         "404":
           description: Invaild id or unable to find this movie.
     put:
       tags:
         - TopRated
       summary: Update a top rated movie by id
-      consumes:
-        - application/json
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully updated a top rated movie
-          schema:
-            $ref: '#/components/schemas/TopRated'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/TopRated'
         "401":
           description: Unauthorized. 
         "404":
@@ -914,14 +900,14 @@ paths:
       tags:
         - TopRated
       summary: Delete a top rated movie by id
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully deleted.
@@ -935,14 +921,14 @@ paths:
       tags: 
         - TopRated
       summary: Get a list of similar movies of a specific movie
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got similar movies of this movie.
@@ -958,14 +944,14 @@ paths:
       tags: 
         - TopRated
       summary: Get a list of credits of a specific movie
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Movie's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got credits of this movie.
@@ -985,23 +971,21 @@ paths:
       responses:
         "200":
           description: Successfully got actors
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Actor'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Actor'
     post:
       tags:
         - Actors
       summary: Add a new actor to database
-      consumes:
-        - application/json
-      produces:
-        - application/json
       responses:
         "201":
           description: Successfully added
-          schema:
-            $ref: '#/components/schemas/Actor'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Actor'
         "401":
           description: Unauthorized. 
         "405":
@@ -1028,40 +1012,42 @@ paths:
       tags:
         - Actors
       summary: Get an actor by id
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Actor's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully got the actor
-          schema:
-            $ref: '#/components/schemas/Actor'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Actor'
         "404":
           description: Invaild id or unable to find this actor.
     put:
       tags:
         - Actors
       summary: Update an actor by id
-      consumes:
-        - application/json
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Actor's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully updated an actor
-          schema:
-            $ref: '#/components/schemas/Actor'
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Actor'
         "401":
           description: Unauthorized. 
         "404":
@@ -1080,14 +1066,14 @@ paths:
       tags:
         - Actors
       summary: Delete an actor by id
-      produces:
-        - application/json
       parameters:
         - name: id
           in: path
           description: Actor's id
           required: true
-          type: integer
+          schema:
+            type: number
+            format: int64
       responses:
         "200":
           description: Successfully deleted.
@@ -1101,8 +1087,6 @@ paths:
       tags:
         - Genres
       summary: Get genres
-      produces:
-        - application/json
       parameters: []
       responses:
         "200":
@@ -1307,6 +1291,5 @@ components:
   securitySchemes:
     bearer:
       type: http
-      name: jwt
       scheme: bearer
       bearerFormat: JWT
