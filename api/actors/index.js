@@ -1,4 +1,5 @@
 import express from 'express';
+import {getPerson} from '../tmdb-api';
 import actorModel from './actorModel';
 
 const router = express.Router();
@@ -7,18 +8,26 @@ router.get('/', (req, res, next) => {
   actorModel.find().then(actors => res.status(200).send(actors)).catch(next);
 });
 
+// router.get('/:id', async (req, res, next) => {
+//   if ( isNaN(req.params.id) ) return res.status(404).json({
+//     code: 404,
+//     msg: "The id should be a number."
+//   });
+//   const id = parseInt(req.params.id);
+//   const actor = await actorModel.findByActorDBId(id);
+//   if ( !actor ) return res.status(404).json({
+//     code: 404,
+//     msg: "The actor could not be found."
+//   });
+//   res.status(200).json(actor).catch((error) => next(error));
+// });
+
 router.get('/:id', async (req, res, next) => {
-  if ( isNaN(req.params.id) ) return res.status(404).json({
-    code: 404,
-    msg: "The id should be a number."
-  });
+  if (isNaN(req.params.id)) return res.status(403).json({ code: 403, msg: 'Invaild movie id.' });
   const id = parseInt(req.params.id);
-  const actor = await actorModel.findByactorDBId(id);
-  if ( !actor ) return res.status(404).json({
-    code: 404,
-    msg: "The actor could not be found."
-  });
-  res.status(200).json(actor).catch((error) => next(error));
+  const person = await getPerson(id);
+  if (!person) return res.status(404).json({ code: 404, msg: 'The resource you requested could not be found.' });
+  res.status(200).json(person);
 });
 
 // Add an actor

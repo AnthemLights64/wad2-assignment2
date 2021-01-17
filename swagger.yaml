@@ -559,6 +559,56 @@ paths:
         "404":
           description: Invaild id or unable to find movie, or unable to find reviews on this movie.
 
+  /api/movies/{id}/similar:
+    get:
+      tags: 
+        - Movies
+      summary: Get a list of similar movies of a specific movie
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got similar movies of this movie.
+        "401":
+          description: Unauthorized. 
+        "403":
+          description: Invaild movie id.
+        "404":
+          description: No similar movies of this movie.
+
+  /api/movies/{id}/credits:
+    get:
+      tags: 
+        - Movies
+      summary: Get a list of credits of a specific movie
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got credits of this movie.
+        "401":
+          description: Unauthorized. 
+        "403":
+          description: Invaild movie id.
+        "404":
+          description: Unable to find credits of this movie.    
+
   /api/topRated/{id}/reviews:
     get:
       tags:
@@ -712,6 +762,56 @@ paths:
         "404":
           description: Invaild id or unable to find movie.    
   
+  /api/upcomings/{id}/similar:
+    get:
+      tags: 
+        - Upcomings
+      summary: Get a list of similar movies of a specific movie
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got similar movies of this movie.
+        "401":
+          description: Unauthorized. 
+        "403":
+          description: Invaild movie id.
+        "404":
+          description: No similar movies of this movie.
+ 
+  /api/upcomings/{id}/credits:
+    get:
+      tags: 
+        - Upcomings
+      summary: Get a list of credits of a specific movie
+      produces:
+        - application/json
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got credits of this movie.
+        "401":
+          description: Unauthorized. 
+        "403":
+          description: Invaild movie id.
+        "404":
+          description: Unable to find credits of this movie.            
+
   /api/topRated:
     get:
       tags:
@@ -829,6 +929,52 @@ paths:
           description: Unauthorized. 
         "404":
           description: Invaild id or unable to find movie.   
+
+  /api/topRated/{id}/similar:
+    get:
+      tags: 
+        - TopRated
+      summary: Get a list of similar movies of a specific movie
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got similar movies of this movie.
+        "401":
+          description: Unauthorized. 
+        "403":
+          description: Invaild movie id.
+        "404":
+          description: No similar movies of this movie.
+
+  /api/topRated/{id}/credits:
+    get:
+      tags: 
+        - TopRated
+      summary: Get a list of credits of a specific movie
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Movie's id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Successfully got credits of this movie.
+        "401":
+          description: Unauthorized. 
+        "403":
+          description: Invaild movie id.
+        "404":
+          description: Unable to find credits of this movie.    
 
   /api/actors:
     get:
